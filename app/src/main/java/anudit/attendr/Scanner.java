@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
@@ -22,12 +24,15 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.zxing.Result;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import static android.Manifest.permission.CAMERA;
 
 public class Scanner extends AppCompatActivity implements ZXingScannerView.ResultHandler  {
+
+    ViewDialog viewDialog;
 
     private static final int REQUEST_CAMERA = 1;
     private ZXingScannerView scannerView;
@@ -38,6 +43,7 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
         super.onCreate(savedInstanceState);
         scannerView = new ZXingScannerView(this);
         setContentView(scannerView);
+        viewDialog = new ViewDialog(this);
 
         int currentApiVersion = Build.VERSION.SDK_INT;
         if(currentApiVersion >=  Build.VERSION_CODES.M)
@@ -127,9 +133,6 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
 
         sendQRdata(myResult);
 
-        Log.d("QRCodeScanner", result.getText());
-        Log.d("QRCodeScanner", result.getBarcodeFormat().toString());
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Scan Result");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -151,7 +154,8 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
 
     }
 
-    public void sendQRdata(String key){
+    public void sendQRdata(String key) {
+        viewDialog.showDialog();
         AndroidNetworking.initialize(getApplicationContext());
         AndroidNetworking.post("http://5cac6179c85e05001452f386.mockapi.io/markv2")
                 .addBodyParameter("key", key)
@@ -161,13 +165,40 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.d("ATTENDR", response.toString());
-                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                        String resp = "error";
+                        try {
+                            resp = response.get("success").toString();
+                            AlertDialog alertDialog = new AlertDialog.Builder(Scanner.this).create();
+                            if(resp != null){
+                                alertDialog.setTitle("Success");
+                                alertDialog.setMessage("Attendance Marked.");
+                            }
+                            else{
+                                alertDialog.setTitle("Error");
+                                alertDialog.setMessage("Try Again.");
+                            }
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            openMenu();
+                                        }
+                                    });
+                            alertDialog.show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
+
                     @Override
                     public void onError(ANError error) {
                         Log.d("ATTENDR", error.toString());
                         Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
+        viewDialog.hideDialog();
+    }
+    public void openMenu(){
+        startActivity(new Intent(this, Menu.class));
     }
 }

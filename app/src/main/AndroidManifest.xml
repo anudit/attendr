@@ -12,8 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
-        <activity android:name=".Attendance"></activity>
+        android:usesCleartextTraffic="true"
+        android:screenOrientation="portrait">
+        <activity android:name=".Attendance" />
         <activity android:name=".Scanner" />
         <activity android:name=".Menu" />
         <activity android:name=".MainActivity">

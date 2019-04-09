@@ -20,15 +20,63 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/menu_lb_title3"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:fontFamily="@font/poppinsregular"
+        android:text="You're enrolled in,"
+        android:textAlignment="textStart"
+        android:textColor="@color/APP_textcolor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_tv_uname" />
+
+    <TextView
+        android:id="@+id/menu_lb_title4"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:fontFamily="@font/poppinsregular"
+        android:text="and have"
+        android:textColor="@color/APP_textcolor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_tv_uname2" />
+
+    <TextView
+        android:id="@+id/menu_lb_title5"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:fontFamily="@font/poppinsregular"
+        android:text="today."
+        android:textColor="@color/APP_textcolor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_tv_uname3" />
+
+    <TextView
         android:id="@+id/menu_lb_title2"
-        android:layout_width="36dp"
+        android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="40dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
         android:fontFamily="@font/poppinsregular"
         android:text="Hi,"
         android:textColor="@color/APP_textcolor"
         android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu_lb_subtitle" />
 
@@ -53,13 +101,43 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         android:fontFamily="@font/poppinsbold"
-        android:text="TextView"
+        android:text="Name"
         android:textColor="@color/APP_textcolor"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu_lb_title2" />
+
+    <TextView
+        android:id="@+id/menu_tv_uname2"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:fontFamily="@font/poppinsbold"
+        android:text="5 Courses"
+        android:textColor="@color/APP_textcolor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_lb_title3" />
+
+    <TextView
+        android:id="@+id/menu_tv_uname3"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:fontFamily="@font/poppinsbold"
+        android:text="6 Classes"
+        android:textColor="@color/APP_textcolor"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/menu_lb_title4" />
 
     <Button
         android:id="@+id/menu_btn_mark"
@@ -84,7 +162,7 @@
         android:background="@drawable/gradient_blue"
         android:fontFamily="@font/poppinsbold"
         android:onClick="openAttendance"
-        android:text="View Attendence"
+        android:text="View Attendance"
         android:textColor="@color/APP_bgcolor"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/menu_btn_logout"
