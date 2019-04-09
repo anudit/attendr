@@ -1,4 +1,5 @@
-package com.insense.anudit.attendr;
+package anudit.attendr;
+
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,36 +19,15 @@ import android.widget.Toast;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.zxing.Result;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-
 import static android.Manifest.permission.CAMERA;
 
-public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+public class Scanner extends AppCompatActivity implements ZXingScannerView.ResultHandler  {
 
     private static final int REQUEST_CAMERA = 1;
     private ZXingScannerView scannerView;
@@ -60,32 +40,10 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         setContentView(scannerView);
 
         int currentApiVersion = Build.VERSION.SDK_INT;
-
         if(currentApiVersion >=  Build.VERSION_CODES.M)
-        {
-            if(checkPermission())
-            {
-                Toast.makeText(getApplicationContext(), "Permission already granted!", Toast.LENGTH_LONG).show();
-            }
-            else
-            {
+            if(!checkPermission())
                 requestPermission();
-            }
-        }
 
-        AndroidNetworking.initialize(getApplicationContext());
-        AndroidNetworking.get("https://jsonplaceholder.typicode.com/todos/1")
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
-                    }
-                });
     }
 
     private boolean checkPermission()
@@ -155,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new android.support.v7.app.AlertDialog.Builder(MainActivity.this)
+        new android.support.v7.app.AlertDialog.Builder(Scanner.this)
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
                 .setNegativeButton("Cancel", null)
@@ -166,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     @Override
     public void handleResult(Result result) {
         final String myResult = result.getText();
+
+        sendQRdata(myResult);
+
         Log.d("QRCodeScanner", result.getText());
         Log.d("QRCodeScanner", result.getBarcodeFormat().toString());
 
@@ -174,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                scannerView.resumeCameraPreview(MainActivity.this);
+                scannerView.resumeCameraPreview(Scanner.this);
             }
         });
         builder.setNeutralButton("Visit", new DialogInterface.OnClickListener() {
@@ -188,5 +149,25 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         AlertDialog alert1 = builder.create();
         alert1.show();
 
+    }
+
+    public void sendQRdata(String key){
+        AndroidNetworking.initialize(getApplicationContext());
+        AndroidNetworking.post("http://5cac6179c85e05001452f386.mockapi.io/markv2")
+                .addBodyParameter("key", key)
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("ATTENDR", response.toString());
+                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.d("ATTENDR", error.toString());
+                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
