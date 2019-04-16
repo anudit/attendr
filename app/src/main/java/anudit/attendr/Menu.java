@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ public class Menu extends AppCompatActivity {
             TextView uname = (TextView) findViewById(R.id.menu_tv_uname);
             uname.setText(name);
         }
+
     }
 
     public void openScanner(View v){ startActivity(new Intent(this, Scanner.class)); }
