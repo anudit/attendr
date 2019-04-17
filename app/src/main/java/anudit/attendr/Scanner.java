@@ -1,8 +1,10 @@
 package anudit.attendr;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -37,14 +39,17 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
     private static final int REQUEST_CAMERA = 1;
     private ZXingScannerView scannerView;
     private static int camId = Camera.CameraInfo.CAMERA_FACING_BACK;
+    SharedPreferences sharedpreferences;
+    public static final String DB = "ATTENDR";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         scannerView = new ZXingScannerView(this);
         setContentView(scannerView);
         viewDialog = new ViewDialog(this);
-
+        sharedpreferences = getSharedPreferences(DB, Context.MODE_PRIVATE);
         int currentApiVersion = Build.VERSION.SDK_INT;
         if(currentApiVersion >=  Build.VERSION_CODES.M)
             if(!checkPermission())
@@ -130,73 +135,31 @@ public class Scanner extends AppCompatActivity implements ZXingScannerView.Resul
     @Override
     public void handleResult(Result result) {
         final String myResult = result.getText();
-
         sendQRdata(myResult);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Scan Result");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                scannerView.resumeCameraPreview(Scanner.this);
-            }
-        });
-        builder.setNeutralButton("Visit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(myResult));
-                startActivity(browserIntent);
-            }
-        });
-        builder.setMessage(result.getText());
-        AlertDialog alert1 = builder.create();
-        alert1.show();
-
+        openMenu();
     }
 
-    public void sendQRdata(String key) {
+    public void sendQRdata(String data) {
+        String tok = sharedpreferences.getString("auth_token", "default value");
+        String uri = "https://theattendrapp.herokuapp.com/mark?data="+data+"&student_token="+tok;
+        Log.d("ATTENDR", uri.toString());
         viewDialog.showDialog();
         AndroidNetworking.initialize(getApplicationContext());
-        AndroidNetworking.post("http://5cac6179c85e05001452f386.mockapi.io/markv2")
-                .addBodyParameter("key", key)
+        AndroidNetworking.post(uri.toString())
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("ATTENDR", response.toString());
-                        String resp = "error";
-                        try {
-                            resp = response.get("success").toString();
-                            AlertDialog alertDialog = new AlertDialog.Builder(Scanner.this).create();
-                            if(resp != null){
-                                alertDialog.setTitle("Success");
-                                alertDialog.setMessage("Attendance Marked.");
-                            }
-                            else{
-                                alertDialog.setTitle("Error");
-                                alertDialog.setMessage("Try Again.");
-                            }
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                            openMenu();
-                                        }
-                                    });
-                            alertDialog.show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                        viewDialog.hideDialog();
+                        Toast.makeText(getApplicationContext(), "Attendence Marked!", Toast.LENGTH_LONG).show();
 
+                    }
                     @Override
                     public void onError(ANError error) {
                         Log.d("ATTENDR", error.toString());
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
-        viewDialog.hideDialog();
     }
     public void openMenu(){
         startActivity(new Intent(this, Menu.class));
